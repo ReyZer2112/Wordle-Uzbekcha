@@ -27,6 +27,31 @@
       color: #fff;
     }
 
+/* ================== MOBIL KLAVIATURA MOSLASH ================== */
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap; /* p ni pastga tushishidan saqlaydi */
+  gap: 4px;
+}
+
+.key {
+  flex: 1;
+  max-width: 35px; /* har bir tugma eni cheklanadi */
+  min-width: 28px;
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+@media (max-width: 450px) {
+  .key {
+    max-width: 30px;
+    font-size: 13px;
+    padding: 8px 0;
+  }
+}
+
+
     body.dark-mode h1,
     body.dark-mode #stats {
       color: #f0f0f0;
