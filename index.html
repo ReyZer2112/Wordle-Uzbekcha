@@ -27,19 +27,123 @@
       color: #fff;
     }
 
-/* ================== MOBIL KLAVIATURA MOSLASH ================== */
+/* ================== KLAVIATURA TARTIBI ================== */
 .keyboard {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 8px;
-  max-width: 420px;   /* klaviatura kengligini chegaralaydi */
+  width: 28%;           /* ✅ Kenglik to‘liq bo‘lsin */
+  max-width: none;       /* ✅ Cheklovni olib tashlash */
   margin: 0 auto;
   background: rgba(0, 0, 0, 0.05);
   border-radius: 7px;
   box-shadow: inset 0 0 6px rgba(0,0,0,0.15);
 }
+
+/* 📱 Mobilda fon va bezakni olib tashlash */
+@media (max-width: 600px) {
+  .keyboard {
+    background: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 4px !important;
+  }
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  margin: 4px 0;
+  flex-wrap: wrap;       /* ✅ Klavishlar sig‘masa yangi qatordan chiqsin */
+}
+
+/* 🌄 Asosiy fon — barcha ekranlar uchun to‘liq qamrab olsin */
+body {
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* 📱 Mobil uchun fon to‘liq sig‘sin */
+@media (max-width: 600px) {
+  body {
+    background-size: cover;
+    background-attachment: scroll;
+  }
+}
+
+/* 📱 Juda kichik ekranlar (320px va past) uchun */
+@media (max-width: 360px) {
+  .keyboard {
+    width: 100% !important;
+    padding: 2px !important;
+    gap: 1px !important;
+  }
+
+  .keyboard-row {
+    gap: 4px !important;
+    margin: 2px 0 !important;
+  }
+
+  .key {
+    padding: 10px 9px !important;
+    font-size: 13px !important;
+    border-radius: 5px !important;
+  }
+
+  h1 {
+    font-size: 20px !important;
+  }
+
+  #stats {
+    font-size: 14px !important;
+  }
+
+  .control-btns button {
+    font-size: 14px !important;
+    padding: 6px 10px !important;
+  }
+}
+
+
+/* 💻 Tablet va Laptoplar (601–1200px) uchun moslashtirish */
+@media (min-width: 601px) and (max-width: 1200px) {
+  body {
+    background-size: cover;      /* 🔥 contain → cover */
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .keyboard {
+    width: 85%;
+    max-width: 550px;
+    margin: 0 auto;
+  }
+
+  .key {
+    padding: 12px 15px;
+    font-size: 18px;
+  }
+}
+
+/* 🖥️ Katta ekranlar (Laptop/Desktop) uchun */
+@media (min-width: 1201px) {
+  body {
+    background-size: cover;      /* 🔥 fon butunlay to‘ldiradi */
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  .keyboard {
+    width: 60%;                 /* klaviatura juda katta bo‘lmasin */
+    max-width: 550px;
+  }
+}
+
 
 .keyboard-row {
   display: flex;
@@ -184,6 +288,21 @@ body.dark-mode .close-btn:hover {
         font-size: 20px;
       }
     }
+
+/* 💻 Faqat kompyuterlar uchun klaviatura tugmalarini kattalashtirish */
+@media (min-width: 601px) {
+  .key {
+    padding: 14px 18px;
+    font-size: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    transition: transform 0.1s ease;
+  }
+
+  .key:hover {
+    transform: scale(1.05);
+  }
+}
 
     /* ================= MODAL ANIMATIONS ================= */
     .modal {
