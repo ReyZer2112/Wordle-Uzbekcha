@@ -220,6 +220,16 @@ body {
       100% { transform: translateX(0); }
     }
 
+.key {
+  transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+.key.pressed {
+  transform: scale(1.15);
+  background-color: #b1ffb1; /* vaqtincha porlaydi */
+}
+
+
     .key {
       padding: 10px 12px;
       border: none;
@@ -231,7 +241,6 @@ body {
       margin: 1px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-
 
 /* =================== YOPISH TUGMASI =================== */
 .close-btn {
@@ -490,43 +499,44 @@ body.dark-mode .social-icons a:hover img {
   </div>
 
   <script>
-    // ==================== SO'ZLAR RO'YXATI ====================
-    const words = [
-      "abzal","admin","aholi","anhor","arava","archa","armon","arzon","asbob","asrab",
-      "ayron","aytib","aytma","aytsa","ayvon","axlat","bahor","baliq","bomba","banan",
-      "barak","bayon","behos","bekor","bemor","berdi","bildi","bilim","bilsa","bilan",
-      "biror","bodom","bolta","boqdi","bordi","borar","bo'ron","bosar","bosdi","bozor",
-      "bular","buloq","bulut","burun","buyuk","dalda","dalik","davir","daryo","dasht",
-      "dasta","dekan","direl","didli","dinor","dilim","doimo","doira","do'kon","domla",
-      "do'ppi","echki","ehrom","ehson","ellik","enaga","engak","eshik","epaqa","ertak",
-      "evara","eshak","falak","foyda","gapir","g'azal","gilam","gisht","gozal","go'sht",
-      "gulli","guruh","gumma","guzar","hadis","halol","halqa","hamda","hayit","hayot",
-      "ibora","ilmiy","inson","ishga","ishon","issiq","jadal","javob","javon","jigar",
-      "jiyan","jiyda","jonli","joriy","jumla","juvon","kamar","kalit","kamon","kasib",
-      "katta","kelar","kelib","keldi","kelin","kiber","kimga","kirar","kirib","kitob",
-      "ko'cha","kolba","komil","ko'mir","ko'rsa","kosib","ko'tar","kovak","kuldi","kulgu",
-      "kulib","kurka","kuyov","lampa","lozim","mahsi","makon","malla","manba","mango",
-      "mazza","mavqe","mavzu","molya","meros","mijoz","mayoq","muhim","mashq","nafas",
-      "namoz","naqsh","nasib","necha","nohaq","nozik","nomus","nusxa","okean","oldin",
-      "olami","olgan","olmos","onlar","o'qchi","o'qisa","orali","osmon","oshdi","otish",
-      "otliq","ozoda","ozroq","palma","parda","patir","poliz","poyga","qadam","qadir",
-      "qalay","qalam","qasam","qatiq","qayiq","qayta","qayer","qaysi","qidir","qilsa",
-      "qirra","qismi","qizil","qiyin","qog'oz","qolar","qolip","qolsa","qonun","qorli",
-      "qotil","qo'ydi","qoyil","quduq","quloq","quvon","quvdi","quvur","quyon","radio",
-      "ramka","rolik","rohat","ro'mol","sahna","sakra","salom","sanoq","sarpo","sariq",
-      "savol","sabzi","sekin","sevar","sevdi","sevgi","setka","sharf","shifo","shina",
-      "shoda","shuni","sig'di","sigir","sifat","sinab","sizni","sohil","soqiy","soqol",
-      "so'zla","soxta","somon","so'roq","sovuq","sukut","sutka","suvoq","tanho","tanla",
-      "taroq","tarix","tavsi","tekin","tezda","tilda","tindi","toldi","tolib","to'nka",
-      "tonna","topdi","topib","tovon","tovuq","tulib","tulki","tuman","tursa","turfa",
-      "turna","turli","tutdi","tugma","uchdi","uzoq","ug'lim","ulamo","ulash","ulfat",
-      "ulkan","ulush","ummon","undov","unday","ustun","urush","ushbu","ustoz","uxlab",
-      "vafot","vatan","xalat","xarid","xasis","xayol","xodim","xonim","yadro","yangi",
-      "yassi","yeldi","yelka","yetti","yigit","yig'la","yo'qol","yotar","yotdi","yozdi",
-      "yozgi","yozib","yozsa","yondi","yonib","yonma","yomon","yugur","yupqa","yurak",
-      "yurar","yurdi","yursa","zabon","zahar","zamin","zamon","zarar","zarba","zarra",
-      "zarur", "ziyon","zabon","zomin"
-    ];
+// ==================== SO'ZLAR RO'YXATI (ALFAVIT BO'YICHA) ====================
+const words = [
+  "abzal","admin","aholi","anhor","arava","archa","armon","arzon","asbob","asrab",
+  "ayron","aytib","axlat","bahor","baliq","banan","banka","barak","bayon","behos",
+  "bekor","bemor","berdi","bildi","bilim","bilan","birga","biror","bodom","bolta",
+  "bozor","boqdi","bordi","bosdi","bitik","buloq","bular","bulut","burun","buyuk",
+  "dalda","danak","daryo","dasht","dasta","davir","dekan","direl","didli","dinor",
+  "dilim","doira","doimo","echki","ehrom","ehson","ellik","enaga","engak","epaqa",
+  "evara","ertak","eshak","eshik","falak","foyda","gapir","gazak","gilam","guzar",
+  "guruh","gumma","hadis","halol","halqa","hamda","hayit","hayot","ibora","ilmiy",
+  "inson","ishon","issiq","jadal","javob","javon","jigar","jiyan","jiyda","jonli",
+  "joriy","jumla","juvon","kamar","kalit","kamon","kasal","kasib","katta","kalta",
+  "kelib","keldi","kelin","kiber","kimga","kirib","kitob","kolba","komil","xayol",
+  "kovak","kulgu","kulib","kurka","kuyov","lampa","lanka","larza","lenta","libos",
+  "limon","lozim","mahsı","makon","malla","manba","mango","mazza","mavqe","mavzu",
+  "mebel","meros","mijoz","mayoq","muhim","muhit","mashq","nafas","naqsh","nasib",
+  "nazar","necha","nohaq","nozik","nomus","nusxa","oldin","okean","olgan","olmos",
+  "onlar","palma","parda","patir","piyoz","poliz","poyga","qadam","qadir","qalay",
+  "qalam","qaysi","qayiq","qayta","qayer","qatiq","qidir","qilsa","qismi","qirra",
+  "qizil","qonun","qolar","qolip","qolsa","qotil","qoyil","quduq","quloq","quvon",
+  "quyon","radio","ramka","rolik","rohat","sahna","sakra","salom","sanoq","sarpo",
+  "sariq","savdo","savol","sabzi","sekin","xabar","sevdi","sevgi","setka","sokin",
+  "sohta","sohil","soqiy","soqol","summa","sutka","suvoq","tanho","tanla","taroq",
+  "tarix","izzat","tekin","tezda","tilda","tindi","teatr","tuman","tulki","tunna",
+  "tutdi","tugma","turfa","turna","turli","tursa","tovon","tovuq","topdi","topib",
+  "tonna","ulamo","ulash","ulfat","ulkan","ulush","ummon","undov","unday","zavod",
+  "ustoz","ustun","urmoq","urush","ushbu","uxlab","vafot","vatan","yadro","yangi",
+  "yassi","yeldi","yelka","yetti","yigit","yomon","elchi","yozdi","qavat","raqam",
+  "yurak","yurdi","yursa","yupqa","zabon","zahar","zamin","zamon","zarar","zarba",
+  "zarra","zarur","ziyon","zomin","linza","baxil","davra","katak","qaror","safar",
+  "salat","talab","afzal","akula","anjir","ariza","avval","uslub","fasil","ferma",
+  "osuda","osmon","ovqat","oxiri","oltin","paxta","panja","poyon","obida","paqir",
+  "oydin","ovchi","ongli","onson","ojiza","ochiq","oqmoq","hiyal","olmoq","ortga",
+  "ortiq","lavha","lahza","ozroq","tilla","tayin","manti","mayda","mayin","mayna",
+  "molya","metan","mezon","kamol","mahsi","kerak","kiyim","aldov","atrof","ayvon",
+  "lagan","lekin","zafar"
+].sort();
+
 
     const sortedWords = words.sort();
     let secret = "";
@@ -734,6 +744,15 @@ document.addEventListener("keydown", (e) => {
       openModal(wordListModal);
     };
 
+// Tugma bosilganda animatsiya effekti
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("key")) {
+    e.target.classList.add("pressed");
+    setTimeout(() => e.target.classList.remove("pressed"), 150);
+  }
+});
+
+
     // =================== WORD LIST SEARCH ===================
     const wordSearchInput = document.getElementById("wordSearch");
     const wordListContent = document.getElementById("wordListContent");
@@ -765,6 +784,19 @@ window.addEventListener("load", () => {
   openModal(modal);
 });
 
+// 📚 So‘zlar ro‘yxati oynasini tashqariga bosganda yopish
+window.addEventListener("click", (e) => {
+  // Modal elementlarni tekshiramiz
+  if (e.target === wordListModal) {
+    closeWordListModal();
+  }
+  if (e.target === modal) {
+    closeModal();
+  }
+  if (e.target === creatorModal) {
+    closeCreatorModal();
+  }
+}); 
 
   </script>
 </body>
