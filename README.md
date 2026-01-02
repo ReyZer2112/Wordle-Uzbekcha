@@ -3,7 +3,7 @@
 
 Salom, do‘stlar! 👋
 O‘zbek tilida 5 harfli so‘zni topishga asoslangan mini web-o‘yin tayyorladim. Mobil va kompyuterda qulay ishlaydi! 📱💻
-
+-----------------------------------
 🔑 Asosiy imkoniyatlar:
 🖐️ O‘zbekcha harflar
 🎶 Tovushlar bilan interaktivlik
