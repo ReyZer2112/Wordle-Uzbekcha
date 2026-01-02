@@ -27,6 +27,8 @@ body.dark-mode {
     body.dark-mode .key {
       background: #333;
       color: #fff;
+      user-select: none;
+    -webkit-tap-highlight-color: transparent;
     }
 
 /* Natija oynasi maxsus stili */
@@ -70,6 +72,25 @@ body.dark-mode #resultWordBox {
 
 body.dark-mode #theme-text {
   color: #f0f0f0;
+}
+
+/* Rejim almashtirgichdagi ko'k rangli belgilanishni yo'qotish */
+.theme-switch-wrapper, 
+.theme-switch, 
+#theme-text, 
+.slider {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none;     /* IE 10+ */
+    user-select: none;         /* Standart */
+    
+    /* Mobil qurilmalarda bosgandagi ko'k effektni yo'qotish */
+    -webkit-tap-highlight-color: transparent; 
+}
+
+/* Switch inputi yashirin bo'lgani uchun unga ham qo'shamiz */
+.theme-switch input {
+    display: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Switch asosi */
