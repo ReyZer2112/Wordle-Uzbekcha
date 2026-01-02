@@ -1,4 +1,4 @@
-# Wordle-O-zbekcha
+# Wordle-Uzbekcha
 🎯 Wordle O‘zbekcha — Har kuni yangi so‘z, aqlni charxlovchi o‘zbekcha o‘yin!
 
 Salom, do‘stlar! 👋
