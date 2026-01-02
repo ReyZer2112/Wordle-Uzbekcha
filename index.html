@@ -6,10 +6,12 @@
   <title>Wordle O‘zbekcha</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    body.dark-mode {
-      background: #121212;
-      color: #f0f0f0;
-    }
+
+body.dark-mode {
+  background: radial-gradient(circle at 50% 30%, #1f2937 0%, #020617 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}   
 
     body.dark-mode .tile {
       background-color: #1e1e1e;
@@ -26,6 +28,177 @@
       background: #333;
       color: #fff;
     }
+
+/* Natija oynasi maxsus stili */
+.result-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.result-success {
+  border-top: 10px solid #6aaa64;
+}
+
+.result-fail {
+  border-top: 10px solid #e74c3c;
+}
+
+#resultTitle {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+body.dark-mode #resultWordBox {
+  background: #333;
+  color: #fff;
+}
+
+/* Rejim almashtirgich konteyneri */
+.theme-switch-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#theme-text {
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s;
+}
+
+body.dark-mode #theme-text {
+  color: #f0f0f0;
+}
+
+/* Switch asosi */
+.theme-switch {
+  display: inline-block;
+  height: 34px;
+  position: relative;
+  width: 60px;
+}
+
+.theme-switch input {
+  display: none;
+}
+
+/* Slayder (tugma tanasi) */
+.slider {
+  background-color: #ccc;
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: .4s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+}
+
+.slider:before {
+  background-color: #fff;
+  bottom: 4px;
+  content: "";
+  height: 26px;
+  left: 4px;
+  position: absolute;
+  transition: .4s;
+  width: 26px;
+  z-index: 2;
+}
+
+/* Dumaloq shakl */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Bosilganda "qimirlash" (pulsatsiya) effekti */
+.theme-switch:active .slider:before {
+  transform: scale(1.2);
+}
+
+/* Rejim yoqilganda */
+input:checked + .slider {
+  background-color: #2b5dab;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Ikonkalar */
+.icon {
+  font-size: 14px;
+  user-select: none;
+}
+
+/* Tungi rejimda tugmani o'zini yaxshilash */
+body.dark-mode .slider {
+  background-color: #1b3a6b;
+}
+
+/* Tungi rejimda kataklar rangini to'g'irlash */
+body.dark-mode .tile {
+    background-color: #1e1e1e;
+    border-color: #444;
+    color: #ffffff; /* Harf oq rangda bo'lishi uchun */
+}
+
+/* Tungi rejimda natija ranglari (Yashil, Sariq, Kulrang) */
+body.dark-mode .tile.correct {
+    background-color: #538d4e !important;
+    border-color: #538d4e !important;
+    color: white !important;
+}
+
+body.dark-mode .tile.present {
+    background-color: #b59f3b !important;
+    border-color: #b59f3b !important;
+    color: white !important;
+}
+
+body.dark-mode .tile.absent {
+    background-color: #3a3a3c !important;
+    border-color: #3a3a3c !important;
+    color: white !important;
+}
+
+/* Klaviatura tugmalari tungi rejimda */
+body.dark-mode .key {
+    background-color: #818384;
+    color: white;
+}
+
+/* Animatsiya: Harf kiritilganda kichik effekt */
+.tile:not(:empty) {
+    animation: pop 0.1s ease-in-out;
+    border-color: #888;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Tungi rejimda "O'yin haqida" tugmasi matni */
+body.dark-mode #toggleTheme {
+    background: #444;
+    color: white;
+    border: 1px solid #666;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
 /* ================== KLAVIATURA TARTIBI ================== */
 .keyboard {
@@ -242,6 +415,51 @@ body {
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
+/* ===== STAR LAYERS ===== */
+.stars, .stars2, .stars3 {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: repeat;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Yulduzlar pattern */
+.stars {
+  background-image: radial-gradient(1px 1px at 20px 30px, white, transparent);
+  background-size: 100px 100px;
+  animation: moveStars 120s linear infinite;
+}
+
+.stars2 {
+  background-image: radial-gradient(1px 1px at 50px 80px, white, transparent);
+  background-size: 160px 160px;
+  animation: moveStars 200s linear infinite;
+}
+
+.stars3 {
+  background-image: radial-gradient(1px 1px at 90px 120px, white, transparent);
+  background-size: 220px 220px;
+  animation: moveStars 300s linear infinite;
+}
+
+/* Faqat dark mode’da ko‘rinsin */
+body.dark-mode .stars,
+body.dark-mode .stars2,
+body.dark-mode .stars3 {
+  opacity: 0.6;
+}
+
+@keyframes moveStars {
+  from { background-position: 0 0; }
+  to { background-position: -1000px 1000px; }
+}
+
+
 /* =================== YOPISH TUGMASI =================== */
 .close-btn {
   display: block;
@@ -409,7 +627,30 @@ body.dark-mode .social-icons a:hover img {
 </head>
 <body>
   <h1>Wordle O‘zbekcha</h1>
-  <button id="toggleTheme">🌙 Tungi rejim</button>
+  <div class="theme-switch-wrapper">
+  <span id="theme-text">Kungi rejim</span>
+  <label class="theme-switch" for="checkbox">
+    <input type="checkbox" id="checkbox" />
+    <div class="slider round">
+      <span class="icon moon">🌙</span>
+      <span class="icon sun">☀️</span>
+    </div>
+  </label>
+</div>
+
+<div id="resultModal" class="modal">
+  <div class="modal-content result-content">
+    <h2 id="resultTitle"></h2>
+    <p id="resultMessage"></p>
+    <div id="resultWordBox" style="display:none; margin: 15px 0; padding: 10px; background: #eee; border-radius: 8px; font-size: 20px; font-weight: bold; letter-spacing: 2px; color: #333;"></div>
+    <button class="close-btn" onclick="closeResultModal()">Yana o‘ynash</button>
+  </div>
+</div>
+
+<div class="stars"></div>
+<div class="stars2"></div>
+<div class="stars3"></div>
+
 
   <div id="stats">G‘alabalar: <span id="wins">0</span> | Mag‘lubiyatlar: <span id="losses">0</span></div>
 
@@ -634,18 +875,16 @@ const words = [
         localStorage.setItem("wordleWins", wins);
         updateStats();
         setTimeout(() => {
-          alert("🎉 Tabriklaymiz! To‘g‘ri topdingiz!");
-          startGame();
-        }, 1000);
+          showResult(true);
+        }, 800);
       } else if (currentRow >= maxGuesses - 1) {
         loseSound.play();
         losses++;
         localStorage.setItem("wordleLosses", losses);
         updateStats();
         setTimeout(() => {
-          alert(`😞 Urinish tugadi. So‘z: ${secret}`);
-          startGame();
-        }, 1000);
+          showResult(false);
+        }, 800);
       }
 
       currentRow++;
@@ -699,23 +938,70 @@ document.addEventListener("keydown", (e) => {
 
     document.getElementById("restart").onclick = () => startGame();
 
-    const themeBtn = document.getElementById("toggleTheme");
-    function setTheme(mode) {
-      if (mode === "dark") {
-        document.body.classList.add("dark-mode");
-        themeBtn.textContent = "☀️ Kungi rejim";
-        localStorage.setItem("theme","dark");
+
+const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+const themeText = document.getElementById('theme-text');
+
+function setTheme(mode) {
+  if (mode === "dark") {
+    document.body.classList.add("dark-mode");
+    toggleSwitch.checked = true;
+    themeText.textContent = "Tungi rejim";
+    localStorage.setItem("theme", "dark");
+  } else {
+    document.body.classList.remove("dark-mode");
+    toggleSwitch.checked = false;
+    themeText.textContent = "Kungi rejim";
+    localStorage.setItem("theme", "light");
+  }
+}
+
+// Almashtirgich hodisasi
+toggleSwitch.addEventListener('change', function(e) {
+  if (e.target.checked) {
+    setTheme("dark");
+  } else {
+    setTheme("light");
+  }
+});
+
+// Saqlangan rejimni yuklash
+const currentTheme = localStorage.getItem("theme") || "light";
+setTheme(currentTheme);
+
+const resultModal = document.getElementById("resultModal");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultMessage = document.getElementById("resultMessage");
+    const resultWordBox = document.getElementById("resultWordBox");
+
+    function showResult(isWin) {
+      const content = resultModal.querySelector('.modal-content');
+      content.classList.remove('result-success', 'result-fail');
+      
+      if (isWin) {
+        resultTitle.textContent = "🎉 G‘alaba!";
+        resultMessage.textContent = "Barakalla! Siz so‘zni to‘g‘ri topdingiz.";
+        resultWordBox.style.display = "none";
+        content.classList.add('result-success');
       } else {
-        document.body.classList.remove("dark-mode");
-        themeBtn.textContent = "🌙 Tungi rejim";
-        localStorage.setItem("theme","light");
+        resultTitle.textContent = "😞 Mag‘lubiyat";
+        resultMessage.textContent = "Afsuski, barcha urinishlar tugadi. To‘g‘ri so‘z:";
+        resultWordBox.textContent = secret.toUpperCase();
+        resultWordBox.style.display = "block";
+        content.classList.add('result-fail');
       }
+      openModal(resultModal);
     }
-    themeBtn.onclick = () => {
-      const isDark = document.body.classList.contains("dark-mode");
-      setTheme(isDark ? "light" : "dark");
-    };
-    setTheme(localStorage.getItem("theme")==="dark"?"dark":"light");
+
+    function closeResultModal() {
+      closeModalWithFade(resultModal);
+      startGame(); // O'yinni avtomat yangilash
+    }
+    
+    // Tashqarini bosganda yopilishiga natija modalini ham qo'shamiz
+    window.addEventListener("click", (e) => {
+      if (e.target === resultModal) closeResultModal();
+    });
 
     // =================== MODAL FUNKSIYALARI ===================
     const modal = document.getElementById("modal");
