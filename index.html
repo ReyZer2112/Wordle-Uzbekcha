@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+@reyz  <!DOCTYPE html>
   <html lang="uz">
   <head>
     <meta charset="UTF-8" />
@@ -538,9 +538,61 @@
     }
   }
 
-      .control-btns {
-        margin: 20px 0;
-      }
+      /* Asosiy boshqaruv tugmalari */
+.control-btns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.control-btns button {
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.control-btns button:hover {
+    background: #e8eef8;
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+/* Tungi rejim tugmalari */
+body.dark-mode .control-btns button {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+body.dark-mode .control-btns button:hover {
+    background: #293b55;
+    color: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 3px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* Mobil moslashuv */
+@media (max-width: 500px) {
+    .control-btns {
+        gap: 7px;
+        padding: 0 5px;
+    }
+
+    .control-btns button {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+}
 
       @media (max-width: 500px) {
         .tile {
@@ -649,13 +701,46 @@
 
   body.dark-mode .social-icons a:hover img {
     transform: scale(1.2);
-    filter: brightness(1.5) invert(1); /* oq rang va biroz yorqinroq */
+    filter: brightness(1.15);
     cursor: pointer;
   }
 
 
     .volume-buttons button { padding:10px 15px; border-radius:8px; background:#333; color:#fff; cursor:pointer; transition:all 0.3s; }
     .volume-buttons button:hover { background:#555; transform:scale(1.1); }
+
+
+    /* Roblox va Snapchat ikonkalari */
+.social-icons a.social-roblox,
+.social-icons a.social-snapchat {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.social-icons a.social-roblox {
+    background: transparent;
+}
+
+.social-icons a.social-snapchat {
+    background: transparent;
+}
+
+.social-icons a.social-roblox img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+}
+
+.social-icons a.social-snapchat img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+}
 
     </style>
   </head>
@@ -748,12 +833,16 @@
       <div class="follow-us">
         <h2>📢 Bizni kuzatib boring</h2>
         <div class="social-icons">
-          <a href="https://instagram.com/reyzer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"></a>
-          <a href="https://www.youtube.com/@ReyZer-2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png"></a>
-          <a href="https://www.snapchat.com/add/reyzer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111703.png"></a>
-          <a href="https://www.roblox.com/users/4669071068/profile" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/743/743927.png"></a>
           <a href="https://t.me/ReyZer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png"></a>
-          <a href="http://discord.gg/reyzer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png"></a>
+          <a href="https://instagram.com/reyzer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"></a>
+          <a href="https://www.youtube.com/@ReyZer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png"></a>
+          <a class="social-roblox" href="https://www.roblox.com/users/11746345524/profile" target="_blank">
+  <img src="https://cdn.simpleicons.org/roblox/008cff" alt="Roblox">
+</a>
+          <a class="social-snapchat" href="https://www.snapchat.com/@reyzer2112" target="_blank">
+  <img src="https://cdn.simpleicons.org/snapchat/f8fc03" alt="Snapchat">
+</a>
+          <a href="https://discord.com/invite/reyzer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png"></a>
         </div>
       </div>
 
@@ -1000,7 +1089,7 @@
   });
 
   // Saqlangan rejimni yuklash
-  const currentTheme = localStorage.getItem("theme") || "light";
+  const currentTheme = localStorage.getItem("theme") || "dark";
   setTheme(currentTheme);
 
   const resultModal = document.getElementById("resultModal");
