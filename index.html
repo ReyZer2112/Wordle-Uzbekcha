@@ -1,752 +1,1003 @@
-@reyz  <!DOCTYPE html>
-  <html lang="uz">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>Wordle O‘zbekcha</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
+<!DOCTYPE html>
+<html lang="uz">
 
-  body.dark-mode {
-    background: radial-gradient(circle at 50% 30%, #1f2937 0%, #020617 100%);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-  }   
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Wordle O‘zbekcha</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body.dark-mode {
+      background: radial-gradient(circle at 50% 30%, #1f2937 0%, #020617 100%);
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
 
-      body.dark-mode .tile {
-        background-color: #1e1e1e;
-        border-color: #444;
-        color: #fff;
-      }
+    body.dark-mode .tile {
+      background-color: #1e1e1e;
+      border-color: #444;
+      color: #fff;
+    }
 
-      body.dark-mode .modal-content {
-        background: #222;
-        color: #fff;
-      }
+    body.dark-mode .modal-content {
+      background: #222;
+      color: #fff;
+    }
 
-      body.dark-mode .key {
-        background: #333;
-        color: #fff;
-      }
+    body.dark-mode .key {
+      background: #333;
+      color: #fff;
+    }
 
-  /* Natija oynasi maxsus stili */
-  .result-content {
-    text-align: center;
-    max-width: 400px;
-  }
+    /* Natija oynasi maxsus stili */
+    .result-content {
+      text-align: center;
+      max-width: 400px;
+    }
 
-  .result-success {
-    border-top: 10px solid #6aaa64;
-  }
+    .result-success {
+      border-top: 10px solid #6aaa64;
+    }
 
-  .result-fail {
-    border-top: 10px solid #e74c3c;
-  }
+    .result-fail {
+      border-top: 10px solid #e74c3c;
+    }
 
-  #resultTitle {
-    font-size: 28px;
-    margin-bottom: 10px;
-  }
+    #resultTitle {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
 
-  body.dark-mode #resultWordBox {
-    background: #333;
-    color: #fff;
-  }
+    body.dark-mode #resultWordBox {
+      background: #333;
+      color: #fff;
+    }
 
-  /* Rejim almashtirgich konteyneri va barcha elementlardagi tanlanishni (selection) yo'qotish */
-  .theme-switch-wrapper, 
-  .theme-switch, 
-  #theme-text, 
-  .slider, 
-  .icon, 
-  .key, 
-  .control-btns button, 
-  .close-btn {
+    /* Rejim almashtirgich konteyneri va barcha elementlardagi tanlanishni (selection) yo'qotish */
+    .theme-switch-wrapper,
+    .theme-switch,
+    #theme-text,
+    .slider,
+    .icon,
+    .key,
+    .control-btns button,
+    .close-btn {
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
-  }
+    }
 
-  .theme-switch-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
+    .theme-switch-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
-  #theme-text {
-    font-weight: bold;
-    color: #333;
-    transition: color 0.3s;
-  }
+    #theme-text {
+      font-weight: bold;
+      color: #333;
+      transition: color 0.3s;
+    }
 
-  body.dark-mode #theme-text {
-    color: #f0f0f0;
-  }
+    body.dark-mode #theme-text {
+      color: #f0f0f0;
+    }
 
-  /* Switch asosi */
-  .theme-switch {
-    display: inline-block;
-    height: 34px;
-    position: relative;
-    width: 60px;
-  }
+    /* Switch asosi */
+    .theme-switch {
+      display: inline-block;
+      height: 34px;
+      position: relative;
+      width: 60px;
+    }
 
-  .theme-switch input {
-    display: none;
-  }
+    .theme-switch input {
+      display: none;
+    }
 
-  /* Slayder (tugma tanasi) */
-  .slider {
-    background-color: #ccc;
-    bottom: 0;
-    cursor: pointer;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transition: .4s;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 5px;
-  }
+    /* Slayder (tugma tanasi) */
+    .slider {
+      background-color: #ccc;
+      bottom: 0;
+      cursor: pointer;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      transition: .4s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5px;
+    }
 
-  .slider:before {
-    background-color: #fff;
-    bottom: 4px;
-    content: "";
-    height: 26px;
-    left: 4px;
-    position: absolute;
-    transition: .4s;
-    width: 26px;
-    z-index: 2;
-  }
+    .slider:before {
+      background-color: #fff;
+      bottom: 4px;
+      content: "";
+      height: 26px;
+      left: 4px;
+      position: absolute;
+      transition: .4s;
+      width: 26px;
+      z-index: 2;
+    }
 
-  /* Dumaloq shakl */
-  .slider.round {
-    border-radius: 34px;
-  }
+    /* Dumaloq shakl */
+    .slider.round {
+      border-radius: 34px;
+    }
 
-  .slider.round:before {
-    border-radius: 50%;
-  }
+    .slider.round:before {
+      border-radius: 50%;
+    }
 
-  /* Bosilganda "qimirlash" (pulsatsiya) effekti */
-  .theme-switch:active .slider:before {
-    transform: scale(1.2);
-  }
+    /* Bosilganda "qimirlash" (pulsatsiya) effekti */
+    .theme-switch:active .slider:before {
+      transform: scale(1.2);
+    }
 
-  /* Rejim yoqilganda */
-  input:checked + .slider {
-    background-color: #2b5dab;
-  }
+    /* Rejim yoqilganda */
+    input:checked+.slider {
+      background-color: #2b5dab;
+    }
 
-  input:checked + .slider:before {
-    transform: translateX(26px);
-  }
+    input:checked+.slider:before {
+      transform: translateX(26px);
+    }
 
-  /* Ikonkalar */
-  .icon {
-    font-size: 14px;
-  }
+    /* Ikonkalar */
+    .icon {
+      font-size: 14px;
+    }
 
-  /* Tungi rejimda tugmani o'zini yaxshilash */
-  body.dark-mode .slider {
-    background-color: #1b3a6b;
-  }
+    /* Tungi rejimda tugmani o'zini yaxshilash */
+    body.dark-mode .slider {
+      background-color: #1b3a6b;
+    }
 
-  /* Tungi rejimda kataklar rangini to'g'irlash */
-  body.dark-mode .tile {
+    /* Tungi rejimda kataklar rangini to'g'irlash */
+    body.dark-mode .tile {
       background-color: #1e1e1e;
       border-color: #444;
       color: #ffffff;
-  }
+    }
 
-  /* Tungi rejimda natija ranglari */
-  body.dark-mode .tile.correct {
+    /* Tungi rejimda natija ranglari */
+    body.dark-mode .tile.correct {
       background-color: #538d4e !important;
       border-color: #538d4e !important;
       color: white !important;
-  }
+    }
 
-  body.dark-mode .tile.present {
+    body.dark-mode .tile.present {
       background-color: #b59f3b !important;
       border-color: #b59f3b !important;
       color: white !important;
-  }
+    }
 
-  body.dark-mode .tile.absent {
+    body.dark-mode .tile.absent {
       background-color: #3a3a3c !important;
       border-color: #3a3a3c !important;
       color: white !important;
-  }
+    }
 
-  /* Klaviatura tugmalari tungi rejimda */
-  body.dark-mode .key {
+    /* Klaviatura tugmalari tungi rejimda */
+    body.dark-mode .key {
       background-color: #818384;
       color: white;
-  }
+    }
 
-  /* Animatsiya */
-  .tile:not(:empty) {
+    /* Animatsiya */
+    .tile:not(:empty) {
       animation: pop 0.1s ease-in-out;
       border-color: #888;
-  }
+    }
 
-  @keyframes pop {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-  }
+    @keyframes pop {
+      0% {
+        transform: scale(1);
+      }
 
-  /* Tungi rejimda "O'yin haqida" tugmasi */
-  body.dark-mode #toggleTheme {
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Tungi rejimda "O'yin haqida" tugmasi */
+    body.dark-mode #toggleTheme {
       background: #444;
       color: white;
       border: 1px solid #666;
       padding: 8px 15px;
       border-radius: 5px;
       cursor: pointer;
-  }
-
-  /* ================== KLAVIATURA TARTIBI ================== */
-  .keyboard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    width: 28%;           /* ✅ Kenglik to‘liq bo‘lsin */
-    max-width: none;       /* ✅ Cheklovni olib tashlash */
-    margin: 0 auto;
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 7px;
-    box-shadow: inset 0 0 6px rgba(0,0,0,0.15);
-  }
-
-  /* 📱 Mobilda fon va bezakni olib tashlash */
-  @media (max-width: 600px) {
-    .keyboard {
-      background: none !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      padding: 4px !important;
     }
-  }
 
-  .keyboard-row {
-    display: flex;
-    justify-content: center;
-    gap: 3px;
-    margin: 4px 0;
-    flex-wrap: wrap;       /* ✅ Klavishlar sig‘masa yangi qatordan chiqsin */
-  }
-
-  /* 🌄 Asosiy fon — barcha ekranlar uchun to‘liq qamrab olsin */
-  body {
-    background-size: cover;
-    background-position: center center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-  }
-
-  /* 📱 Mobil uchun fon to‘liq sig‘sin */
-  @media (max-width: 600px) {
-    body {
-      background-size: cover;
-      background-attachment: scroll;
-    }
-  }
-
-  /* 📱 Juda kichik ekranlar (320px va past) uchun */
-  @media (max-width: 360px) {
+    /* ================== KLAVIATURA TARTIBI ================== */
     .keyboard {
-      width: 100% !important;
-      padding: 2px !important;
-      gap: 1px !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      width: 28%;
+      /* ✅ Kenglik to‘liq bo‘lsin */
+      max-width: none;
+      /* ✅ Cheklovni olib tashlash */
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 7px;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 📱 Mobilda fon va bezakni olib tashlash */
+    @media (max-width: 600px) {
+      .keyboard {
+        background: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 4px !important;
+      }
     }
 
     .keyboard-row {
-      gap: 4px !important;
-      margin: 2px 0 !important;
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      margin: 4px 0;
+      flex-wrap: wrap;
+      /* ✅ Klavishlar sig‘masa yangi qatordan chiqsin */
     }
 
-    .key {
-      padding: 10px 9px !important;
-      font-size: 13px !important;
-      border-radius: 5px !important;
-    }
-
-    h1 {
-      font-size: 20px !important;
-    }
-
-    #stats {
-      font-size: 14px !important;
-    }
-
-    .control-btns button {
-      font-size: 14px !important;
-      padding: 6px 10px !important;
-    }
-  }
-
-
-  /* 💻 Tablet va Laptoplar (601–1200px) uchun moslashtirish */
-  @media (min-width: 601px) and (max-width: 1200px) {
+    /* 🌄 Asosiy fon — barcha ekranlar uchun to‘liq qamrab olsin */
     body {
-      background-size: cover;      /* 🔥 contain → cover */
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    .keyboard {
-      width: 85%;
-      max-width: 550px;
-      margin: 0 auto;
-    }
-
-    .key {
-      padding: 12px 15px;
-      font-size: 18px;
-    }
-  }
-
-  /* 🖥️ Katta ekranlar (Laptop/Desktop) uchun */
-  @media (min-width: 1201px) {
-    body {
-      background-size: cover;      /* 🔥 fon butunlay to‘ldiradi */
+      background-size: cover;
       background-position: center center;
+      background-attachment: fixed;
       background-repeat: no-repeat;
     }
 
-    .keyboard {
-      width: 60%;                 /* klaviatura juda katta bo‘lmasin */
-      max-width: 550px;
+    /* 📱 Mobil uchun fon to‘liq sig‘sin */
+    @media (max-width: 600px) {
+      body {
+        background-size: cover;
+        background-attachment: scroll;
+      }
     }
-  }
 
-
-  .keyboard-row {
-    display: flex;
-    justify-content: center;
-    gap: 3px;
-    margin: 4px 0;
-    flex-wrap: nowrap;
-  }
-
-      body.dark-mode h1,
-      body.dark-mode #stats {
-        color: #f0f0f0;
+    /* 📱 Juda kichik ekranlar (320px va past) uchun */
+    @media (max-width: 360px) {
+      .keyboard {
+        width: 100% !important;
+        padding: 2px !important;
+        gap: 1px !important;
       }
 
-      body {
-        font-family: sans-serif;
-        background: #f2f2f2;
-        text-align: center;
-        margin: 0;
-        padding: 20px;
+      .keyboard-row {
+        gap: 4px !important;
+        margin: 2px 0 !important;
+      }
+
+      .key {
+        padding: 10px 9px !important;
+        font-size: 13px !important;
+        border-radius: 5px !important;
       }
 
       h1 {
-        color: #333;
-        margin-bottom: 5px;
+        font-size: 20px !important;
       }
 
       #stats {
-        font-size: 16px;
-        margin-bottom: 15px;
-        color: #555;
+        font-size: 14px !important;
       }
 
-        #game {
-    display: grid;
-    grid-template-rows: repeat(6, 1fr);
-    gap: 5px; /* Masofani kamaytirdik */
-    justify-content: center;
-    margin: 10px 0; /* Marginni kamaytirdik */
-    flex-grow: 1; /* Maydon mavjud joyni egallaydi */
-}
+      .control-btns button {
+        font-size: 14px !important;
+        padding: 6px 10px !important;
+      }
+    }
 
-.tile {
-    width: 45px; /* 50px dan 45px ga tushirdik */
-    height: 45px;
-    font-size: 22px;
-    /* ... qolgan stillar ... */
-}
 
-/* Kichik telefonlar uchun (iPhone SE va h.k) */
-@media (max-height: 670px) {
+    /* 💻 Tablet va Laptoplar (601–1200px) uchun moslashtirish */
+    @media (min-width: 601px) and (max-width: 1200px) {
+      body {
+        background-size: cover;
+        /* 🔥 contain → cover */
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      .keyboard {
+        width: 85%;
+        max-width: 550px;
+        margin: 0 auto;
+      }
+
+      .key {
+        padding: 12px 15px;
+        font-size: 18px;
+      }
+    }
+
+    /* 🖥️ Katta ekranlar (Laptop/Desktop) uchun */
+    @media (min-width: 1201px) {
+      body {
+        background-size: cover;
+        /* 🔥 fon butunlay to‘ldiradi */
+        background-position: center center;
+        background-repeat: no-repeat;
+      }
+
+      .keyboard {
+        width: 60%;
+        /* klaviatura juda katta bo‘lmasin */
+        max-width: 550px;
+      }
+    }
+
+
+    .keyboard-row {
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      margin: 4px 0;
+      flex-wrap: nowrap;
+    }
+
+    body.dark-mode h1,
+    body.dark-mode #stats {
+      color: #f0f0f0;
+    }
+
+    body {
+      font-family: sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    #stats {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: #555;
+    }
+
+    #game {
+      display: grid;
+      grid-template-rows: repeat(6, 1fr);
+      gap: 5px;
+      /* Masofani kamaytirdik */
+      justify-content: center;
+      margin: 10px 0;
+      /* Marginni kamaytirdik */
+      flex-grow: 1;
+      /* Maydon mavjud joyni egallaydi */
+    }
+
     .tile {
+      width: 45px;
+      /* 50px dan 45px ga tushirdik */
+      height: 45px;
+      font-size: 22px;
+      /* ... qolgan stillar ... */
+    }
+
+    /* Kichik telefonlar uchun (iPhone SE va h.k) */
+    @media (max-height: 670px) {
+      .tile {
         width: 38px;
         height: 38px;
         font-size: 18px;
+      }
+
+      h1 {
+        font-size: 18px;
+        margin: 0;
+      }
+
+      #stats {
+        margin-bottom: 5px;
+        font-size: 14px;
+      }
     }
-    h1 { font-size: 18px; margin: 0; }
-    #stats { margin-bottom: 5px; font-size: 14px; }
-}
 
-      .row {
-        display: flex;
-        justify-content: center;
-        gap: 5px;
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .tile {
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+      border: 2px solid #ccc;
+      background-color: white;
+      line-height: 50px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .correct {
+      background-color: #6aaa64;
+      color: white;
+      border-color: #6aaa64;
+    }
+
+    .present {
+      background-color: #c9b458;
+      color: white;
+      border-color: #c9b458;
+    }
+
+    .absent {
+      background-color: #787c7e;
+      color: white;
+      border-color: #787c7e;
+    }
+
+    .shake {
+      animation: shake 0.3s;
+    }
+
+    @keyframes shake {
+      0% {
+        transform: translateX(-5px);
       }
 
-      .tile {
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-        font-weight: bold;
-        text-transform: uppercase;
-        border: 2px solid #ccc;
-        background-color: white;
-        line-height: 50px;
-        text-align: center;
-        transition: all 0.2s ease;
+      25% {
+        transform: translateX(5px);
       }
 
-      .correct { background-color: #6aaa64; color: white; border-color: #6aaa64; }
-      .present { background-color: #c9b458; color: white; border-color: #c9b458; }
-      .absent { background-color: #787c7e; color: white; border-color: #787c7e; }
-
-      .shake {
-        animation: shake 0.3s;
+      50% {
+        transform: translateX(-5px);
       }
 
-      @keyframes shake {
-        0% { transform: translateX(-5px); }
-        25% { transform: translateX(5px); }
-        50% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-        100% { transform: translateX(0); }
+      75% {
+        transform: translateX(5px);
       }
 
-  .key {
-    transition: transform 0.1s ease, background-color 0.15s ease;
-  }
-
-  .key.pressed {
-    transform: scale(1.15);
-    background-color: #b1ffb1; /* vaqtincha porlaydi */
-  }
-
-
-      .key {
-        padding: 10px 12px;
-        border: none;
-        border-radius: 6px;
-        background: #e0e0e0;
-        font-size: 16px;
-        cursor: pointer;
-        user-select: none;
-        margin: 1px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      100% {
+        transform: translateX(0);
       }
+    }
 
-  /* ===== STAR LAYERS ===== */
-  .stars, .stars2, .stars3 {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    background-repeat: repeat;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
+    .key {
+      transition: transform 0.1s ease, background-color 0.15s ease;
+    }
 
-  /* Yulduzlar pattern */
-  .stars {
-    background-image: radial-gradient(1px 1px at 20px 30px, white, transparent);
-    background-size: 100px 100px;
-    animation: moveStars 120s linear infinite;
-  }
-
-  .stars2 {
-    background-image: radial-gradient(1px 1px at 50px 80px, white, transparent);
-    background-size: 160px 160px;
-    animation: moveStars 200s linear infinite;
-  }
-
-  .stars3 {
-    background-image: radial-gradient(1px 1px at 90px 120px, white, transparent);
-    background-size: 220px 220px;
-    animation: moveStars 300s linear infinite;
-  }
-
-  /* Faqat dark mode’da ko‘rinsin */
-  body.dark-mode .stars,
-  body.dark-mode .stars2,
-  body.dark-mode .stars3 {
-    opacity: 0.6;
-  }
-
-  @keyframes moveStars {
-    from { background-position: 0 0; }
-    to { background-position: -1000px 1000px; }
-  }
+    .key.pressed {
+      transform: scale(1.15);
+      background-color: #b1ffb1;
+      /* vaqtincha porlaydi */
+    }
 
 
-  /* =================== YOPISH TUGMASI =================== */
-  .close-btn {
-    display: block;
-    width: 95%; /* modalga mos kenglik */
-    max-width: 450px;
-    margin: 20px auto 0 auto;
-    padding: 16px 20px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-    background: linear-gradient(135deg,#ff416c,#ff4b2b); /* kunduz rejimi ranglari */
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-  }
-
-  /* Hover animatsiyasi */
-  .close-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    background: linear-gradient(135deg,#ff4b2b,#ff416c);
-  }
-
-  /* Tun rejimida rang o‘zgartirish */
-  body.dark-mode .close-btn {
-    background: linear-gradient(135deg,#1b3a6b,#0d1a33);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
-  }
-
-  body.dark-mode .close-btn:hover {
-    background: linear-gradient(135deg,#0d1a33,#1b3a6b);
-  }
-
-  /* Mobil moslashuv */
-  @media (max-width: 500px) {
-    .close-btn {
+    .key {
+      padding: 10px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #e0e0e0;
       font-size: 16px;
-      padding: 14px 16px;
+      cursor: pointer;
+      user-select: none;
+      margin: 1px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
-  }
 
-      /* Asosiy boshqaruv tugmalari */
-.control-btns {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 20px 0;
-}
+    /* ===== STAR LAYERS ===== */
+    .stars,
+    .stars2,
+    .stars3 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-repeat: repeat;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
 
-.control-btns button {
-    background: #ffffff;
-    color: #333333;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 9px 14px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.25s ease;
-}
+    /* Yulduzlar pattern */
+    .stars {
+      background-image: radial-gradient(1px 1px at 20px 30px, white, transparent);
+      background-size: 100px 100px;
+      animation: moveStars 120s linear infinite;
+    }
 
-.control-btns button:hover {
-    background: #e8eef8;
-    border-color: #3b82f6;
-    transform: translateY(-2px);
-}
+    .stars2 {
+      background-image: radial-gradient(1px 1px at 50px 80px, white, transparent);
+      background-size: 160px 160px;
+      animation: moveStars 200s linear infinite;
+    }
 
-/* Tungi rejim tugmalari */
-body.dark-mode .control-btns button {
-    background: #1e293b;
-    color: #e2e8f0;
-    border: 1px solid #334155;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
+    .stars3 {
+      background-image: radial-gradient(1px 1px at 90px 120px, white, transparent);
+      background-size: 220px 220px;
+      animation: moveStars 300s linear infinite;
+    }
 
-body.dark-mode .control-btns button:hover {
-    background: #293b55;
-    color: #ffffff;
-    border-color: #3b82f6;
-    box-shadow: 0 3px 12px rgba(59, 130, 246, 0.2);
-}
+    /* Faqat dark mode’da ko‘rinsin */
+    body.dark-mode .stars,
+    body.dark-mode .stars2,
+    body.dark-mode .stars3 {
+      opacity: 0.6;
+    }
 
-/* Mobil moslashuv */
-@media (max-width: 500px) {
+    @keyframes moveStars {
+      from {
+        background-position: 0 0;
+      }
+
+      to {
+        background-position: -1000px 1000px;
+      }
+    }
+
+
+    /* =================== YOPISH TUGMASI =================== */
+    .close-btn {
+      display: block;
+      width: 95%;
+      /* modalga mos kenglik */
+      max-width: 450px;
+      margin: 20px auto 0 auto;
+      padding: 16px 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      /* kunduz rejimi ranglari */
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Hover animatsiyasi */
+    .close-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(135deg, #ff4b2b, #ff416c);
+    }
+
+    /* Tun rejimida rang o‘zgartirish */
+    body.dark-mode .close-btn {
+      background: linear-gradient(135deg, #1b3a6b, #0d1a33);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark-mode .close-btn:hover {
+      background: linear-gradient(135deg, #0d1a33, #1b3a6b);
+    }
+
+    /* Mobil moslashuv */
+    @media (max-width: 500px) {
+      .close-btn {
+        font-size: 16px;
+        padding: 14px 16px;
+      }
+    }
+
+    /* Asosiy boshqaruv tugmalari */
     .control-btns {
-        gap: 7px;
-        padding: 0 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0;
     }
 
     .control-btns button {
+      background: #ffffff;
+      color: #333333;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .control-btns button:hover {
+      background: #e8eef8;
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+    }
+
+    /* Tungi rejim tugmalari */
+    body.dark-mode .control-btns button {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    body.dark-mode .control-btns button:hover {
+      background: #293b55;
+      color: #ffffff;
+      border-color: #3b82f6;
+      box-shadow: 0 3px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    /* Mobil moslashuv */
+    @media (max-width: 500px) {
+      .control-btns {
+        gap: 7px;
+        padding: 0 5px;
+      }
+
+      .control-btns button {
         padding: 8px 10px;
         font-size: 12px;
-    }
-}
-
-      @media (max-width: 500px) {
-        .tile {
-          width: 40px;
-          height: 40px;
-          font-size: 20px;
-        }
       }
-
-  /* 💻 Faqat kompyuterlar uchun klaviatura tugmalarini kattalashtirish */
-  @media (min-width: 601px) {
-    .key {
-      padding: 14px 18px;
-      font-size: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-      transition: transform 0.1s ease;
     }
 
-    .key:hover {
-      transform: scale(1.05);
+    @media (max-width: 500px) {
+      .tile {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
     }
-  }
 
-      /* ================= MODAL ANIMATIONS ================= */
-      .modal {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        opacity: 0;
-        transition: opacity 0.3s ease;
+    /* 💻 Faqat kompyuterlar uchun klaviatura tugmalarini kattalashtirish */
+    @media (min-width: 601px) {
+      .key {
+        padding: 14px 18px;
+        font-size: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        transition: transform 0.1s ease;
       }
 
-      .modal.show {
-        opacity: 1;
+      .key:hover {
+        transform: scale(1.05);
       }
+    }
 
-      .modal-content {
-        background: white;
-        padding: 20px;
-        max-width: 90%;
-        border-radius: 10px;
-        text-align: left;
-        transform: translateY(-20px);
-        transition: transform 0.3s ease;
-      }
+    /* ================= MODAL ANIMATIONS ================= */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
 
-      .modal.show .modal-content {
-        transform: translateY(0);
+    .modal.show {
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      max-width: 90%;
+      border-radius: 10px;
+      text-align: left;
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal.show .modal-content {
+      transform: translateY(0);
+    }
+
+    /* ===== SO'ZLAR RO'YXATI DIZAYNI ===== */
+
+    .word-list-modal-content {
+      width: min(560px, calc(100vw - 32px));
+      max-width: 560px;
+      max-height: 85vh;
+      max-height: 85dvh;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 22px;
+      border-radius: 18px;
+      background: #ffffff;
+      color: #1e293b;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    .word-list-modal-content h2 {
+      margin: 0 0 16px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    #wordSearch {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      border: 1px solid #dbe2ea;
+      border-radius: 11px;
+      outline: none;
+      background: #f8fafc;
+      color: #1e293b;
+      font-size: 15px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #wordSearch:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.13);
+    }
+
+    #wordCount {
+      color: #64748b;
+      font-size: 12px;
+      text-align: left;
+      margin: 2px 0 12px;
+    }
+
+    .word-list-content {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      overflow-y: auto;
+      min-height: 0;
+      max-height: 50vh;
+      max-height: 50dvh;
+      padding: 2px 5px 8px 2px;
+      scrollbar-width: thin;
+      scrollbar-color: #94a3b8 transparent;
+    }
+
+    .word-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 39px;
+      padding: 7px 4px;
+      box-sizing: border-box;
+      border: 1px solid #e2e8f0;
+      border-radius: 9px;
+      background: #f8fafc;
+      color: #334155;
+      font-family: sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.2s, border-color 0.2s, background 0.2s;
+    }
+
+    .word-item:hover {
+      transform: translateY(-2px);
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    .word-empty {
+      grid-column: 1 / -1;
+      padding: 25px 10px;
+      color: #94a3b8;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    /* Tungi rejim */
+    body.dark-mode .word-list-modal-content {
+      background: #111827;
+      color: #f1f5f9;
+    }
+
+    body.dark-mode #wordSearch {
+      background: #1e293b;
+      color: #f1f5f9;
+      border-color: #334155;
+    }
+
+    body.dark-mode #wordSearch::placeholder {
+      color: #94a3b8;
+    }
+
+    body.dark-mode #wordCount {
+      color: #94a3b8;
+    }
+
+    body.dark-mode .word-item {
+      background: #1e293b;
+      border-color: #334155;
+      color: #e2e8f0;
+    }
+
+    body.dark-mode .word-item:hover {
+      background: #293b55;
+      border-color: #3b82f6;
+    }
+
+    /* Planshet */
+    @media (max-width: 600px) {
+      .word-list-modal-content {
+        width: calc(100vw - 24px);
+        padding: 17px;
+        border-radius: 15px;
       }
 
       .word-list-content {
-        max-height: 300px;
-        overflow-y: auto;
-        white-space: pre-wrap;
-        font-family: monospace;
-        font-size: 14px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+      }
+    }
+
+    /* Kichik telefon */
+    @media (max-width: 380px) {
+      .word-list-content {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-  /* O'yin haqida modal yopish tugmasi kichikroq */
-  #modal .close-btn {
-    width: 85%;        /* avval 95% edi */
-    max-width: 400px;  /* avval 450px edi */
-    padding: 12px 18px; /* avval 16px 20px edi */
-    font-size: 16px;   /* avval 18px edi */
-  }
-
-  #modal .close-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    background: linear-gradient(135deg,#2a5dab,#4a90e2);
-  }
-
-  body.dark-mode #modal .close-btn {
-    background: linear-gradient(135deg,#1b3a6b,#0d1a33);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
-  }
-
-  body.dark-mode #modal .close-btn:hover {
-    background: linear-gradient(135deg,#0d1a33,#1b3a6b);
-  }
-
-
-
-  /* Social block */
-    .follow-us, .volume-control {
-      text-align:center; background:linear-gradient(135deg,#1f1f1f,#2c2c2c);
-      color:#fff; padding:20px; border-radius:15px; max-width:450px;
-      margin:20px auto; box-shadow:0 0 15px rgba(0,0,0,0.5); font-family:Arial,sans-serif;
+      .word-list-modal-content h2 {
+        font-size: 19px;
+      }
     }
-    .follow-us h2, .volume-control h2 {
-      font-size:22px; margin-bottom:10px; border-bottom:1px solid #555; padding-bottom:5px;
+
+    /* O'yin haqida modal yopish tugmasi kichikroq */
+    #modal .close-btn {
+      width: 85%;
+      /* avval 95% edi */
+      max-width: 400px;
+      /* avval 450px edi */
+      padding: 12px 18px;
+      /* avval 16px 20px edi */
+      font-size: 16px;
+      /* avval 18px edi */
     }
-    .social-icons, .volume-buttons { display:flex; justify-content:center; flex-wrap:wrap; gap:15px; }
-    .social-icons a img, .volume-buttons button { width:45px; height:45px; transition:0.3s; }
+
+    #modal .close-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(135deg, #2a5dab, #4a90e2);
+    }
+
+    body.dark-mode #modal .close-btn {
+      background: linear-gradient(135deg, #1b3a6b, #0d1a33);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark-mode #modal .close-btn:hover {
+      background: linear-gradient(135deg, #0d1a33, #1b3a6b);
+    }
+
+
+
+    /* Social block */
+    .follow-us,
+    .volume-control {
+      text-align: center;
+      background: linear-gradient(135deg, #1f1f1f, #2c2c2c);
+      color: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 450px;
+      margin: 20px auto;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      font-family: Arial, sans-serif;
+    }
+
+    .follow-us h2,
+    .volume-control h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #555;
+      padding-bottom: 5px;
+    }
+
+    .social-icons,
+    .volume-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .social-icons a img,
+    .volume-buttons button {
+      width: 45px;
+      height: 45px;
+      transition: 0.3s;
+    }
+
     .social-icons a:hover img {
-    transform: scale(1.2);
-    filter: brightness(1.3);
-    cursor: pointer;
-  }
+      transform: scale(1.2);
+      filter: brightness(1.3);
+      cursor: pointer;
+    }
 
-  body.dark-mode .social-icons a:hover img {
-    transform: scale(1.2);
-    filter: brightness(1.15);
-    cursor: pointer;
-  }
+    body.dark-mode .social-icons a:hover img {
+      transform: scale(1.2);
+      filter: brightness(1.15);
+      cursor: pointer;
+    }
 
 
-    .volume-buttons button { padding:10px 15px; border-radius:8px; background:#333; color:#fff; cursor:pointer; transition:all 0.3s; }
-    .volume-buttons button:hover { background:#555; transform:scale(1.1); }
+    .volume-buttons button {
+      padding: 10px 15px;
+      border-radius: 8px;
+      background: #333;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .volume-buttons button:hover {
+      background: #555;
+      transform: scale(1.1);
+    }
 
 
     /* Roblox va Snapchat ikonkalari */
-.social-icons a.social-roblox,
-.social-icons a.social-snapchat {
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    overflow: hidden;
-}
+    .social-icons a.social-roblox,
+    .social-icons a.social-snapchat {
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      overflow: hidden;
+    }
 
-.social-icons a.social-roblox {
-    background: transparent;
-}
+    .social-icons a.social-roblox {
+      background: transparent;
+    }
 
-.social-icons a.social-snapchat {
-    background: transparent;
-}
+    .social-icons a.social-snapchat {
+      background: transparent;
+    }
 
-.social-icons a.social-roblox img {
-    width: 38px;
-    height: 38px;
-    object-fit: contain;
-}
+    .social-icons a.social-roblox img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+    }
 
-.social-icons a.social-snapchat img {
-    width: 38px;
-    height: 38px;
-    object-fit: contain;
-}
+    .social-icons a.social-snapchat img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+    }
+  </style>
+</head>
 
-    </style>
-  </head>
-  <body>
-    <h1>Wordle O‘zbekcha</h1>
-    <div class="theme-switch-wrapper">
+<body>
+  <h1>Wordle O‘zbekcha</h1>
+  <div class="theme-switch-wrapper">
     <span id="theme-text">Kungi rejim</span>
     <label class="theme-switch" for="checkbox">
       <input type="checkbox" id="checkbox" />
@@ -761,7 +1012,9 @@ body.dark-mode .control-btns button:hover {
     <div class="modal-content result-content">
       <h2 id="resultTitle"></h2>
       <p id="resultMessage"></p>
-      <div id="resultWordBox" style="display:none; margin: 15px 0; padding: 10px; background: #eee; border-radius: 8px; font-size: 20px; font-weight: bold; letter-spacing: 2px; color: #333;"></div>
+      <div id="resultWordBox"
+        style="display:none; margin: 15px 0; padding: 10px; background: #eee; border-radius: 8px; font-size: 20px; font-weight: bold; letter-spacing: 2px; color: #333;">
+      </div>
       <button class="close-btn" onclick="closeResultModal()">Yana o‘ynash</button>
     </div>
   </div>
@@ -771,23 +1024,23 @@ body.dark-mode .control-btns button:hover {
   <div class="stars3"></div>
 
 
-    <div id="stats">G‘alabalar: <span id="wins">0</span> | Mag‘lubiyatlar: <span id="losses">0</span></div>
+  <div id="stats">G‘alabalar: <span id="wins">0</span> | Mag‘lubiyatlar: <span id="losses">0</span></div>
 
-    <div id="game"></div>
+  <div id="game"></div>
 
-    <div class="control-btns">
-      <button id="restart">🔁 Qaytadan boshlash</button>
-      <button id="aboutBtn">ℹ️ O‘yin haqida</button>
-      <button id="creatorBtn">📢 Bizni kuzatib boring</button>
-      <button id="wordListBtn">📚 So‘zlar ro‘yxati</button>
-    </div>
+  <div class="control-btns">
+    <button id="restart">🔁 Qaytadan boshlash</button>
+    <button id="aboutBtn">ℹ️ O‘yin haqida</button>
+    <button id="creatorBtn">📢 Bizni kuzatib boring</button>
+    <button id="wordListBtn">📚 So‘zlar ro‘yxati</button>
+  </div>
 
-    <div class="keyboard" id="keyboard"></div>
+  <div class="keyboard" id="keyboard"></div>
 
-    <!-- Tovushlar -->
-    <audio id="sound-invalid" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
-    <audio id="sound-win" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
-    <audio id="sound-lose" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"></audio>
+  <!-- Tovushlar -->
+  <audio id="sound-invalid" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+  <audio id="sound-win" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+  <audio id="sound-lose" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"></audio>
 
   <!-- O'yin haqida Modal -->
   <div id="modal" class="modal">
@@ -805,9 +1058,11 @@ body.dark-mode .control-btns button:hover {
         <li>⬜ So‘zda yo‘q</li>
       </ul>
       <p>
-        🔤 O‘zbek tilidagi ba’zi harflar — <strong>g‘</strong>, <strong>o‘</strong> — ikki belgidan iborat bo‘lsa ham, o‘yinda <strong>bitta harf</strong> sifatida hisoblanadi. 
-        </p> 
-        <p>Masalan, so‘zlarni kiritishda: “g‘isht” → <strong>gisht</strong>, “do‘kon” → <strong>dokon</strong>, “o‘rmon” → <strong>ormon</strong>.
+        🔤 O‘zbek tilidagi ba’zi harflar — <strong>g‘</strong>, <strong>o‘</strong> — ikki belgidan iborat bo‘lsa ham,
+        o‘yinda <strong>bitta harf</strong> sifatida hisoblanadi.
+      </p>
+      <p>Masalan, so‘zlarni kiritishda: “g‘isht” → <strong>gisht</strong>, “do‘kon” → <strong>dokon</strong>, “o‘rmon” →
+        <strong>ormon</strong>.
       </p>
       <p>
         Quyidagi so‘zlarda bu harflar ishtirok etadi:
@@ -833,380 +1088,409 @@ body.dark-mode .control-btns button:hover {
       <div class="follow-us">
         <h2>📢 Bizni kuzatib boring</h2>
         <div class="social-icons">
-          <a href="https://t.me/ReyZer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png"></a>
-          <a href="https://instagram.com/reyzer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"></a>
-          <a href="https://www.youtube.com/@ReyZer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png"></a>
+          <a href="https://t.me/ReyZer2112" target="_blank"><img
+              src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png"></a>
+          <a href="https://instagram.com/reyzer2112" target="_blank"><img
+              src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"></a>
+          <a href="https://www.youtube.com/@ReyZer2112" target="_blank"><img
+              src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png"></a>
           <a class="social-roblox" href="https://www.roblox.com/users/11746345524/profile" target="_blank">
-  <img src="https://cdn.simpleicons.org/roblox/008cff" alt="Roblox">
-</a>
+            <img src="https://cdn.simpleicons.org/roblox/008cff" alt="Roblox">
+          </a>
           <a class="social-snapchat" href="https://www.snapchat.com/@reyzer2112" target="_blank">
-  <img src="https://cdn.simpleicons.org/snapchat/f8fc03" alt="Snapchat">
-</a>
-          <a href="https://discord.com/invite/reyzer2112" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png"></a>
+            <img src="https://cdn.simpleicons.org/snapchat/f8fc03" alt="Snapchat">
+          </a>
+          <a href="https://discord.com/invite/reyzer2112" target="_blank"><img
+              src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png"></a>
         </div>
       </div>
 
-    <button class="close-btn" onclick="closeCreatorModal()">Yopish</button>
+      <button class="close-btn" onclick="closeCreatorModal()">Yopish</button>
 
     </div>
   </div>
 
 
-    <!-- So'zlar ro'yxati Modal -->
-    <div id="wordListModal" class="modal">
-      <div class="modal-content">
-        <h2>📚 So‘zlar ro‘yxati</h2>
-        <input type="text" id="wordSearch" placeholder="So‘z qidiring..." style="width: 100%; padding: 6px; margin-bottom: 10px; box-sizing: border-box;">
-        <div id="wordListContent" class="word-list-content"></div>
-        <button onclick="closeWordListModal()">Yopish</button>
-      </div>
+  <!-- So'zlar ro'yxati Modal -->
+  <div id="wordListModal" class="modal">
+
+    <div class="modal-content word-list-modal-content">
+
+      <h2>📚 So‘zlar ro‘yxati</h2>
+
+      <input type="text" id="wordSearch" placeholder="🔍 So‘z qidiring..." autocomplete="off">
+
+      <div id="wordCount"></div>
+
+      <div id="wordListContent" class="word-list-content"></div>
+
+      <button class="close-btn" onclick="closeWordListModal()">
+        Yopish
+      </button>
+
     </div>
+  </div>
 
-    <script>
-  // ==================== SO'ZLAR RO'YXATI (ALFAVIT BO'YICHA) ====================
-  const words = [
-    "abzal","admin","aholi","anhor","arava","archa","armon","arzon","asbob","asrab",
-    "ayron","aytib","axlat","bahor","baliq","banan","banka","barak","bayon","behos",
-    "bekor","bemor","berdi","bildi","bilim","bilan","birga","biror","bodom","bolta",
-    "bozor","boqdi","bordi","bosdi","bitik","buloq","bular","bulut","burun","buyuk",
-    "dalda","danak","daryo","dasht","dasta","davir","dekan","direl","didli","dinor",
-    "dilim","doira","doimo","echki","ehrom","ehson","ellik","enaga","engak","epaqa",
-    "evara","ertak","eshak","eshik","falak","foyda","gapir","gazak","gilam","guzar",
-    "guruh","gumma","hadis","halol","halqa","hamda","hayit","hayot","ibora","ilmiy",
-    "inson","ishon","issiq","jadal","javob","javon","jigar","jiyan","jiyda","jonli",
-    "joriy","jumla","juvon","kamar","kalit","kamon","kasal","kasib","katta","kalta",
-    "kelib","keldi","kelin","kiber","kimga","kirib","kitob","kolba","komil","xayol",
-    "kovak","kulgu","kulib","kurka","kuyov","lampa","lanka","larza","lenta","libos",
-    "limon","lozim","mahsı","makon","malla","manba","mango","mazza","mavqe","mavzu",
-    "mebel","meros","mijoz","mayoq","muhim","muhit","mashq","nafas","naqsh","nasib",
-    "nazar","necha","nohaq","nozik","nomus","nusxa","oldin","okean","olgan","olmos",
-    "onlar","palma","parda","patir","piyoz","poliz","poyga","qadam","qadir","qalay",
-    "qalam","qaysi","qayiq","qayta","qayer","qatiq","qidir","randa","panda","qirra",
-    "qizil","qonun","qolar","qolip","qolsa","qotil","qoyil","quduq","quloq","quvon",
-    "quyon","radio","ramka","rolik","rohat","sahna","sakra","salom","sanoq","sarpo",
-    "sariq","savdo","savol","sabzi","sekin","xabar","sevdi","sevgi","setka","sokin",
-    "sohta","sohil","soqiy","soqol","summa","sutka","suvoq","tanho","tanla","taroq",
-    "tarix","izzat","tekin","tezda","tilda","tindi","teatr","tuman","tulki","tunna",
-    "tutdi","tugma","turfa","turna","turli","tursa","tovon","tovuq","topdi","topib",
-    "tonna","ulamo","ulash","ulfat","ulkan","ulush","ummon","undov","unday","zavod",
-    "ustoz","ustun","urmoq","urush","ushbu","uxlab","vafot","vatan","yadro","yangi",
-    "yassi","yeldi","yelka","yetti","yigit","yomon","elchi","yozdi","qavat","raqam",
-    "yurak","yurdi","yursa","yupqa","zabon","zahar","zamin","zamon","zarar","zarba",
-    "zarra","zarur","ziyon","zomin","linza","baxil","davra","katak","qaror","safar",
-    "salat","talab","afzal","akula","anjir","ariza","avval","uslub","fasil","ferma",
-    "osuda","osmon","ovqat","oxiri","oltin","paxta","panja","poyon","obida","paqir",
-    "oydin","ovchi","ongli","onson","ojiza","ochiq","oqmoq","hiyal","olmoq","ortga",
-    "ortiq","lavha","lahza","ozroq","tilla","tayin","manti","mayda","mayin","mayna",
-    "molya","metan","mezon","kamol","mahsi","kerak","kiyim","aldov","atrof","ayvon",
-    "lagan","lekin","zafar"
-  ].sort();
+  <script>
+    // ==================== SO'ZLAR RO'YXATI (ALFAVIT BO'YICHA) ====================
+    const words = [
+      "abzal", "admin", "aholi", "anhor", "arava", "archa", "armon", "arzon", "asbob", "asrab",
+      "ayron", "aytib", "axlat", "bahor", "baliq", "banan", "banka", "barak", "bayon", "behos",
+      "bekor", "bemor", "berdi", "bildi", "bilim", "bilan", "birga", "biror", "bodom", "bolta",
+      "bozor", "boqdi", "bordi", "bosdi", "bitik", "buloq", "bular", "bulut", "burun", "buyuk",
+      "dalda", "danak", "daryo", "dasht", "dasta", "davir", "dekan", "direl", "didli", "dinor",
+      "dilim", "doira", "doimo", "echki", "ehrom", "ehson", "ellik", "enaga", "engak", "epaqa",
+      "evara", "ertak", "eshak", "eshik", "falak", "foyda", "gapir", "gazak", "gilam", "guzar",
+      "guruh", "gumma", "hadis", "halol", "halqa", "hamda", "hayit", "hayot", "ibora", "ilmiy",
+      "inson", "ishon", "issiq", "jadal", "javob", "javon", "jigar", "jiyan", "jiyda", "jonli",
+      "joriy", "jumla", "juvon", "kamar", "kalit", "kamon", "kasal", "kasib", "katta", "kalta",
+      "kelib", "keldi", "kelin", "kiber", "kimga", "kirib", "kitob", "kolba", "komil", "xayol",
+      "kovak", "kulgu", "kulib", "kurka", "kuyov", "lampa", "lanka", "larza", "lenta", "libos",
+      "limon", "lozim", "mahsı", "makon", "malla", "manba", "mango", "mazza", "mavqe", "mavzu",
+      "mebel", "meros", "mijoz", "mayoq", "muhim", "muhit", "mashq", "nafas", "naqsh", "nasib",
+      "nazar", "necha", "nohaq", "nozik", "nomus", "nusxa", "oldin", "okean", "olgan", "olmos",
+      "onlar", "palma", "parda", "patir", "piyoz", "poliz", "poyga", "qadam", "qadir", "qalay",
+      "qalam", "qaysi", "qayiq", "qayta", "qayer", "qatiq", "qidir", "randa", "panda", "qirra",
+      "qizil", "qonun", "qolar", "qolip", "qolsa", "qotil", "qoyil", "quduq", "quloq", "quvon",
+      "quyon", "radio", "ramka", "rolik", "rohat", "sahna", "sakra", "salom", "sanoq", "sarpo",
+      "sariq", "savdo", "savol", "sabzi", "sekin", "xabar", "sevdi", "sevgi", "setka", "sokin",
+      "sohta", "sohil", "soqiy", "soqol", "summa", "sutka", "suvoq", "tanho", "tanla", "taroq",
+      "tarix", "izzat", "tekin", "tezda", "tilda", "tindi", "teatr", "tuman", "tulki", "tunna",
+      "tutdi", "tugma", "turfa", "turna", "turli", "tursa", "tovon", "tovuq", "topdi", "topib",
+      "tonna", "ulamo", "ulash", "ulfat", "ulkan", "ulush", "ummon", "undov", "unday", "zavod",
+      "ustoz", "ustun", "urmoq", "urush", "ushbu", "uxlab", "vafot", "vatan", "yadro", "yangi",
+      "yassi", "yeldi", "yelka", "yetti", "yigit", "yomon", "elchi", "yozdi", "qavat", "raqam",
+      "yurak", "yurdi", "yursa", "yupqa", "zabon", "zahar", "zamin", "zamon", "zarar", "zarba",
+      "zarra", "zarur", "ziyon", "zomin", "linza", "baxil", "davra", "katak", "qaror", "safar",
+      "salat", "talab", "afzal", "akula", "anjir", "ariza", "avval", "uslub", "fasil", "ferma",
+      "osuda", "osmon", "ovqat", "oxiri", "oltin", "paxta", "panja", "poyon", "obida", "paqir",
+      "oydin", "ovchi", "ongli", "onson", "ojiza", "ochiq", "oqmoq", "hiyal", "olmoq", "ortga",
+      "ortiq", "lavha", "lahza", "ozroq", "tilla", "tayin", "manti", "mayda", "mayin", "mayna",
+      "molya", "metan", "mezon", "kamol", "mahsi", "kerak", "kiyim", "aldov", "atrof", "ayvon",
+      "lagan", "lekin", "zafar"
+    ].sort();
 
 
-      const sortedWords = words.sort();
-      let secret = "";
-      let currentRow = 0;
-      let currentGuess = "";
-      const maxGuesses = 6;
-      const game = document.getElementById("game");
-      const keyboard = document.getElementById("keyboard");
+    const sortedWords = words.sort();
+    let secret = "";
+    let currentRow = 0;
+    let currentGuess = "";
+    const maxGuesses = 6;
+    const game = document.getElementById("game");
+    const keyboard = document.getElementById("keyboard");
 
-      const winSound = document.getElementById("sound-win");
-      const loseSound = document.getElementById("sound-lose");
-      const invalidSound = document.getElementById("sound-invalid");
+    const winSound = document.getElementById("sound-win");
+    const loseSound = document.getElementById("sound-lose");
+    const invalidSound = document.getElementById("sound-invalid");
 
-      let wins = parseInt(localStorage.getItem("wordleWins")) || 0;
-      let losses = parseInt(localStorage.getItem("wordleLosses")) || 0;
+    let wins = parseInt(localStorage.getItem("wordleWins")) || 0;
+    let losses = parseInt(localStorage.getItem("wordleLosses")) || 0;
 
-      function updateStats() {
-        document.getElementById("wins").textContent = wins;
-        document.getElementById("losses").textContent = losses;
+    function updateStats() {
+      document.getElementById("wins").textContent = wins;
+      document.getElementById("losses").textContent = losses;
+    }
+
+    function createGrid() {
+      game.innerHTML = "";
+      for (let i = 0; i < maxGuesses; i++) {
+        const row = document.createElement("div");
+        row.className = "row";
+        for (let j = 0; j < 5; j++) {
+          const tile = document.createElement("div");
+          tile.className = "tile";
+          row.appendChild(tile);
+        }
+        game.appendChild(row);
+      }
+    }
+
+    function updateGrid() {
+      const row = game.children[currentRow];
+      for (let i = 0; i < 5; i++) {
+        row.children[i].textContent = currentGuess[i] || "";
+      }
+    }
+
+    function shakeRow() {
+      const row = game.children[currentRow];
+      row.classList.remove("shake");
+      void row.offsetWidth;
+      row.classList.add("shake");
+      for (let tile of row.children) tile.style.borderColor = "red";
+      setTimeout(() => {
+        for (let tile of row.children) tile.style.borderColor = "#ccc";
+      }, 500);
+    }
+
+    function confettiBoom() {
+      confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+    }
+
+    function submitGuess() {
+      if (currentGuess.length !== 5 || !words.includes(currentGuess)) {
+        shakeRow();
+        invalidSound.play();
+        return;
       }
 
-      function createGrid() {
-        game.innerHTML = "";
-        for (let i = 0; i < maxGuesses; i++) {
-          const row = document.createElement("div");
-          row.className = "row";
-          for (let j = 0; j < 5; j++) {
-            const tile = document.createElement("div");
-            tile.className = "tile";
-            row.appendChild(tile);
+      const row = game.children[currentRow];
+      const result = Array(5).fill("absent");
+      const used = Array(5).fill(false);
+
+      for (let i = 0; i < 5; i++) {
+        if (currentGuess[i] === secret[i]) {
+          result[i] = "correct";
+          used[i] = true;
+        }
+      }
+
+      for (let i = 0; i < 5; i++) {
+        if (result[i] === "correct") continue;
+        for (let j = 0; j < 5; j++) {
+          if (!used[j] && currentGuess[i] === secret[j]) {
+            result[i] = "present";
+            used[j] = true;
+            break;
           }
-          game.appendChild(row);
         }
       }
 
-      function updateGrid() {
-        const row = game.children[currentRow];
-        for (let i = 0; i < 5; i++) {
-          row.children[i].textContent = currentGuess[i] || "";
-        }
+      for (let i = 0; i < 5; i++) {
+        row.children[i].classList.add(result[i]);
       }
 
-      function shakeRow() {
-        const row = game.children[currentRow];
-        row.classList.remove("shake");
-        void row.offsetWidth;
-        row.classList.add("shake");
-        for (let tile of row.children) tile.style.borderColor = "red";
+      if (currentGuess === secret) {
+        winSound.play();
+        confettiBoom();
+        wins++;
+        localStorage.setItem("wordleWins", wins);
+        updateStats();
         setTimeout(() => {
-          for (let tile of row.children) tile.style.borderColor = "#ccc";
-        }, 500);
+          showResult(true);
+        }, 800);
+      } else if (currentRow >= maxGuesses - 1) {
+        loseSound.play();
+        losses++;
+        localStorage.setItem("wordleLosses", losses);
+        updateStats();
+        setTimeout(() => {
+          showResult(false);
+        }, 800);
       }
 
-      function confettiBoom() {
-        confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+      currentRow++;
+      currentGuess = "";
+    }
+
+    function handleKey(letter) {
+      if (letter === "⌫") {
+        currentGuess = currentGuess.slice(0, -1);
+      } else if (letter === "⏎") {
+        submitGuess();
+      } else if (/^[a-zа-ёвқҳғ']$/i.test(letter) && currentGuess.length < 5) {
+        currentGuess += letter;
       }
+      updateGrid();
+    }
 
-      function submitGuess() {
-        if (currentGuess.length !== 5 || !words.includes(currentGuess)) {
-          shakeRow();
-          invalidSound.play();
-          return;
-        }
+    function createKeyboard() {
+      const rows = [
+        ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+        ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+        ["z", "x", "c", "v", "b", "n", "m", "⌫", "⏎"]
+      ];
 
-        const row = game.children[currentRow];
-        const result = Array(5).fill("absent");
-        const used = Array(5).fill(false);
+      keyboard.innerHTML = "";
 
-        for (let i = 0; i < 5; i++) {
-          if (currentGuess[i] === secret[i]) {
-            result[i] = "correct";
-            used[i] = true;
-          }
-        }
-
-        for (let i = 0; i < 5; i++) {
-          if (result[i] === "correct") continue;
-          for (let j = 0; j < 5; j++) {
-            if (!used[j] && currentGuess[i] === secret[j]) {
-              result[i] = "present";
-              used[j] = true;
-              break;
-            }
-          }
-        }
-
-        for (let i = 0; i < 5; i++) {
-          row.children[i].classList.add(result[i]);
-        }
-
-        if (currentGuess === secret) {
-          winSound.play();
-          confettiBoom();
-          wins++;
-          localStorage.setItem("wordleWins", wins);
-          updateStats();
-          setTimeout(() => {
-            showResult(true);
-          }, 800);
-        } else if (currentRow >= maxGuesses - 1) {
-          loseSound.play();
-          losses++;
-          localStorage.setItem("wordleLosses", losses);
-          updateStats();
-          setTimeout(() => {
-            showResult(false);
-          }, 800);
-        }
-
-        currentRow++;
-        currentGuess = "";
-      }
-
-      function handleKey(letter) {
-        if (letter === "⌫") {
-          currentGuess = currentGuess.slice(0, -1);
-        } else if (letter === "⏎") {
-          submitGuess();
-        } else if (/^[a-zа-ёвқҳғ']$/i.test(letter) && currentGuess.length < 5) {
-          currentGuess += letter;
-        }
-        updateGrid();
-      }
-
-      function createKeyboard() {
-        const rows = [
-          ["q","w","e","r","t","y","u","i","o","p"],
-          ["a","s","d","f","g","h","j","k","l"],
-          ["z","x","c","v","b","n","m","⌫","⏎"]
-        ];
-
-        keyboard.innerHTML = "";
-
-        rows.forEach(row => {
-          const rowDiv = document.createElement("div");
-          rowDiv.className = "keyboard-row";
-          row.forEach(k => {
-            const btn = document.createElement("button");
-            btn.textContent = k;
-            btn.className = "key";
-            btn.onclick = () => handleKey(k);
-            rowDiv.appendChild(btn);
-          });
-          keyboard.appendChild(rowDiv);
+      rows.forEach(row => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "keyboard-row";
+        row.forEach(k => {
+          const btn = document.createElement("button");
+          btn.textContent = k;
+          btn.className = "key";
+          btn.onclick = () => handleKey(k);
+          rowDiv.appendChild(btn);
         });
-      }
-
-  document.addEventListener("keydown", (e) => {
-    // agar foydalanuvchi input yoki textarea ichida yozayotgan bo‘lsa — qaytamiz
-    if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") return;
-
-    const key = e.key.toLowerCase();
-    if (key === "enter") handleKey("⏎");
-    else if (key === "backspace") handleKey("⌫");
-    else if (/^[a-zа-ёвқҳғ']$/i.test(key)) handleKey(key);
-  });
-
-
-      document.getElementById("restart").onclick = () => startGame();
-
-
-  const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
-  const themeText = document.getElementById('theme-text');
-
-  function setTheme(mode) {
-    if (mode === "dark") {
-      document.body.classList.add("dark-mode");
-      toggleSwitch.checked = true;
-      themeText.textContent = "Tungi rejim";
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.body.classList.remove("dark-mode");
-      toggleSwitch.checked = false;
-      themeText.textContent = "Kungi rejim";
-      localStorage.setItem("theme", "light");
-    }
-  }
-
-  // Almashtirgich hodisasi
-  toggleSwitch.addEventListener('change', function(e) {
-    if (e.target.checked) {
-      setTheme("dark");
-    } else {
-      setTheme("light");
-    }
-  });
-
-  // Saqlangan rejimni yuklash
-  const currentTheme = localStorage.getItem("theme") || "dark";
-  setTheme(currentTheme);
-
-  const resultModal = document.getElementById("resultModal");
-      const resultTitle = document.getElementById("resultTitle");
-      const resultMessage = document.getElementById("resultMessage");
-      const resultWordBox = document.getElementById("resultWordBox");
-
-      function showResult(isWin) {
-        const content = resultModal.querySelector('.modal-content');
-        content.classList.remove('result-success', 'result-fail');
-        
-        if (isWin) {
-          resultTitle.textContent = "🎉 G‘alaba!";
-          resultMessage.textContent = "Barakalla! Siz so‘zni to‘g‘ri topdingiz.";
-          resultWordBox.style.display = "none";
-          content.classList.add('result-success');
-        } else {
-          resultTitle.textContent = "😞 Mag‘lubiyat";
-          resultMessage.textContent = "Afsuski, barcha urinishlar tugadi. To‘g‘ri so‘z:";
-          resultWordBox.textContent = secret.toUpperCase();
-          resultWordBox.style.display = "block";
-          content.classList.add('result-fail');
-        }
-        openModal(resultModal);
-      }
-
-      function closeResultModal() {
-        closeModalWithFade(resultModal);
-        startGame(); // O'yinni avtomat yangilash
-      }
-      
-      // Tashqarini bosganda yopilishiga natija modalini ham qo'shamiz
-      window.addEventListener("click", (e) => {
-        if (e.target === resultModal) closeResultModal();
+        keyboard.appendChild(rowDiv);
       });
+    }
 
-      // =================== MODAL FUNKSIYALARI ===================
-      const modal = document.getElementById("modal");
-      const creatorModal = document.getElementById("creatorModal");
-      const wordListModal = document.getElementById("wordListModal");
+    document.addEventListener("keydown", (e) => {
+      // agar foydalanuvchi input yoki textarea ichida yozayotgan bo‘lsa — qaytamiz
+      if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") return;
 
-      function openModal(modalElement) {
-        modalElement.style.display = "flex";
-        setTimeout(() => modalElement.classList.add("show"), 10);
+      const key = e.key.toLowerCase();
+      if (key === "enter") handleKey("⏎");
+      else if (key === "backspace") handleKey("⌫");
+      else if (/^[a-zа-ёвқҳғ']$/i.test(key)) handleKey(key);
+    });
+
+
+    document.getElementById("restart").onclick = () => startGame();
+
+
+    const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+    const themeText = document.getElementById('theme-text');
+
+    function setTheme(mode) {
+      if (mode === "dark") {
+        document.body.classList.add("dark-mode");
+        toggleSwitch.checked = true;
+        themeText.textContent = "Tungi rejim";
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.body.classList.remove("dark-mode");
+        toggleSwitch.checked = false;
+        themeText.textContent = "Kungi rejim";
+        localStorage.setItem("theme", "light");
+      }
+    }
+
+    // Almashtirgich hodisasi
+    toggleSwitch.addEventListener('change', function (e) {
+      if (e.target.checked) {
+        setTheme("dark");
+      } else {
+        setTheme("light");
+      }
+    });
+
+    // Saqlangan rejimni yuklash
+    const currentTheme = localStorage.getItem("theme") || "dark";
+    setTheme(currentTheme);
+
+    const resultModal = document.getElementById("resultModal");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultMessage = document.getElementById("resultMessage");
+    const resultWordBox = document.getElementById("resultWordBox");
+
+    function showResult(isWin) {
+      const content = resultModal.querySelector('.modal-content');
+      content.classList.remove('result-success', 'result-fail');
+
+      if (isWin) {
+        resultTitle.textContent = "🎉 G‘alaba!";
+        resultMessage.textContent = "Barakalla! Siz so‘zni to‘g‘ri topdingiz.";
+        resultWordBox.style.display = "none";
+        content.classList.add('result-success');
+      } else {
+        resultTitle.textContent = "😞 Mag‘lubiyat";
+        resultMessage.textContent = "Afsuski, barcha urinishlar tugadi. To‘g‘ri so‘z:";
+        resultWordBox.textContent = secret.toUpperCase();
+        resultWordBox.style.display = "block";
+        content.classList.add('result-fail');
+      }
+      openModal(resultModal);
+    }
+
+    function closeResultModal() {
+      closeModalWithFade(resultModal);
+      startGame(); // O'yinni avtomat yangilash
+    }
+
+    // Tashqarini bosganda yopilishiga natija modalini ham qo'shamiz
+    window.addEventListener("click", (e) => {
+      if (e.target === resultModal) closeResultModal();
+    });
+
+    // =================== MODAL FUNKSIYALARI ===================
+    const modal = document.getElementById("modal");
+    const creatorModal = document.getElementById("creatorModal");
+    const wordListModal = document.getElementById("wordListModal");
+
+    function openModal(modalElement) {
+      modalElement.style.display = "flex";
+      setTimeout(() => modalElement.classList.add("show"), 10);
+    }
+
+    function closeModal() { closeModalWithFade(modal); }
+    function closeCreatorModal() { closeModalWithFade(creatorModal); }
+    function closeWordListModal() { closeModalWithFade(wordListModal); }
+
+    function closeModalWithFade(modalElement) {
+      modalElement.classList.remove("show");
+      setTimeout(() => modalElement.style.display = "none", 300);
+    }
+
+    document.getElementById("aboutBtn").onclick = () => openModal(modal);
+    document.getElementById("creatorBtn").onclick = () => openModal(creatorModal);
+    document.getElementById("wordListBtn").onclick = () => {
+      wordSearchInput.value = "";
+      displayWords(words);
+      openModal(wordListModal);
+    };
+
+    // Tugma bosilganda animatsiya effekti
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("key")) {
+        e.target.classList.add("pressed");
+        setTimeout(() => e.target.classList.remove("pressed"), 150);
+      }
+    });
+
+
+    // =================== WORD LIST SEARCH ===================
+    const wordSearchInput = document.getElementById("wordSearch");
+    const wordListContent = document.getElementById("wordListContent");
+
+    function displayWords(list) {
+
+      const wordCount = document.getElementById("wordCount");
+
+      wordCount.textContent =
+        `Jami ${list.length} ta so‘z topildi`;
+
+      if (list.length === 0) {
+        wordListContent.innerHTML =
+          '<div class="word-empty">😕 So‘z topilmadi</div>';
+        return;
       }
 
-      function closeModal() { closeModalWithFade(modal); }
-      function closeCreatorModal() { closeModalWithFade(creatorModal); }
-      function closeWordListModal() { closeModalWithFade(wordListModal); }
+      wordListContent.innerHTML = list.map((word, index) => `
+        <div class="word-item">${word}</div>
+    `).join("");
+    }
 
-      function closeModalWithFade(modalElement) {
-        modalElement.classList.remove("show");
-        setTimeout(() => modalElement.style.display = "none", 300);
+    wordSearchInput.addEventListener("input", () => {
+      const query = wordSearchInput.value.toLowerCase();
+      const filtered = words.filter(w => w.includes(query));
+      displayWords(filtered);
+    });
+
+    // =================== O'YIN START ===================
+    function startGame() {
+      secret = words[Math.floor(Math.random() * words.length)];
+      currentRow = 0;
+      currentGuess = "";
+      createGrid();
+      createKeyboard();
+    }
+
+    startGame();
+    updateStats();
+
+    // Sahifa yuklanganda "O'yin haqida" modal avtomatik ochilsin
+    window.addEventListener("load", () => {
+      openModal(modal);
+    });
+
+    // 📚 So‘zlar ro‘yxati oynasini tashqariga bosganda yopish
+    window.addEventListener("click", (e) => {
+      // Modal elementlarni tekshiramiz
+      if (e.target === wordListModal) {
+        closeWordListModal();
       }
-
-      document.getElementById("aboutBtn").onclick = () => openModal(modal);
-      document.getElementById("creatorBtn").onclick = () => openModal(creatorModal);
-      document.getElementById("wordListBtn").onclick = () => {
-        wordSearchInput.value = "";
-        displayWords(words);
-        openModal(wordListModal);
-      };
-
-  // Tugma bosilganda animatsiya effekti
-  document.addEventListener("click", (e) => {
-    if (e.target.classList.contains("key")) {
-      e.target.classList.add("pressed");
-      setTimeout(() => e.target.classList.remove("pressed"), 150);
-    }
-  });
-
-
-      // =================== WORD LIST SEARCH ===================
-      const wordSearchInput = document.getElementById("wordSearch");
-      const wordListContent = document.getElementById("wordListContent");
-
-      function displayWords(list) {
-        wordListContent.innerHTML = list.map((w,i) => `${i+1}. ${w}`).join("<br>");
+      if (e.target === modal) {
+        closeModal();
       }
-
-      wordSearchInput.addEventListener("input", () => {
-        const query = wordSearchInput.value.toLowerCase();
-        const filtered = words.filter(w => w.includes(query));
-        displayWords(filtered);
-      });
-
-      // =================== O'YIN START ===================
-      function startGame() {
-        secret = words[Math.floor(Math.random()*words.length)];
-        currentRow = 0;
-        currentGuess = "";
-        createGrid();
-        createKeyboard();
+      if (e.target === creatorModal) {
+        closeCreatorModal();
       }
+    });
 
-      startGame();
-      updateStats();
+  </script>
+</body>
 
-  // Sahifa yuklanganda "O'yin haqida" modal avtomatik ochilsin
-  window.addEventListener("load", () => {
-    openModal(modal);
-  });
-
-  // 📚 So‘zlar ro‘yxati oynasini tashqariga bosganda yopish
-  window.addEventListener("click", (e) => {
-    // Modal elementlarni tekshiramiz
-    if (e.target === wordListModal) {
-      closeWordListModal();
-    }
-    if (e.target === modal) {
-      closeModal();
-    }
-    if (e.target === creatorModal) {
-      closeCreatorModal();
-    }
-  }); 
-
-    </script>
-  </body>
-  </html>
+</html>
